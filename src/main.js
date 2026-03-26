@@ -6,6 +6,10 @@ import {
   clearGallery,
   showLoader,
   hideLoader,
+  showLoadMore,
+  hideLoadMore,
+  disableLoadMore,
+  enableLoadMore,
 } from './js/render-functions';
 
 const form = document.querySelector('.form');
@@ -28,7 +32,7 @@ form.addEventListener('submit', async event => {
 
   page = 1;
   clearGallery();
-  loadMoreBtn.classList.add('hidden');
+  hideLoadMore();
   showLoader();
 
   try {
@@ -45,7 +49,7 @@ form.addEventListener('submit', async event => {
     }
 
     createGallery(data.hits);
-    loadMoreBtn.classList.remove('hidden');
+    showLoadMore();
 
     if (page * 15 >= totalHits) {
       loadMoreBtn.classList.add('hidden');
@@ -62,10 +66,12 @@ form.addEventListener('submit', async event => {
 
 loadMoreBtn.addEventListener('click', async () => {
   page += 1;
+  disableLoadMore();
   showLoader();
   try {
     const data = await getImagesByQuery(query, page);
     createGallery(data.hits);
+    enableLoadMore();
     const card = document.querySelector('.gallery-item');
     const cardHeight = card.getBoundingClientRect().height;
     window.scrollBy({
@@ -73,13 +79,15 @@ loadMoreBtn.addEventListener('click', async () => {
       behavior: 'smooth',
     });
     if (page * 15 >= totalHits) {
-      loadMoreBtn.classList.add('hidden');
+      hideLoadMore();
       iziToast.info({
         message: "We're sorry, but you've reached the end of search results.",
       });
     }
   } catch (error) {
-    console.log(error);
+    iziToast.error({
+      message: 'Something went wrong. Please try again!',
+    });
   } finally {
     hideLoader(0);
   }

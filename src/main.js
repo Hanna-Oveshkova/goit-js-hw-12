@@ -52,7 +52,7 @@ form.addEventListener('submit', async event => {
     showLoadMore();
 
     if (page * 15 >= totalHits) {
-      loadMoreBtn.classList.add('hidden');
+      hideLoadMore();
       iziToast.info({
         message: "We're sorry, but you've reached the end of search results.",
       });
@@ -87,6 +87,7 @@ loadMoreBtn.addEventListener('click', async () => {
   } catch (error) {
     iziToast.error({
       message: 'Something went wrong. Please try again!',
+      position: 'topRight',
     });
   } finally {
     hideLoader(0);
